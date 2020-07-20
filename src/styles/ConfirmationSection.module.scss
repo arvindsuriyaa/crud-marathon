@@ -1,0 +1,49 @@
+@import './variables';
+
+#confirmSection {
+  padding: 0 48px;
+}
+
+#pincode {
+  margin-top: 8px;
+}
+#pincodeField {
+  width: 360px;
+  border-radius: 5px;
+  height: 30px;
+  outline: none;
+  border-style: ridge;
+}
+#submitSection {
+  display: flex;
+  justify-content: flex-end;
+}
+.error{
+  @include error
+}
+#update,
+#register {
+  outline: none;
+  height: 40px;
+  width: 100px;
+  background-color: #00c61b;
+  color: white;
+  border: none;
+  margin: 0px 15px;
+  cursor: pointer;
+}
+#cancel {
+  outline: none;
+  height: 40px;
+  width: 100px;
+  background-color: #00c61b;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.show{
+  display: block;
+}
+.hide{
+  display: none;
+}

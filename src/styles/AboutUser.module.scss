@@ -1,0 +1,42 @@
+@import "./variables";
+
+.formSection2 {
+  @include formStyle;
+  .organisation {
+    margin: 9px 0px;
+  }
+  #selectOrganisation {
+    width: 100%;
+    height: 32px;
+    border-radius: 5px;
+    background-color: white;
+    border-style: ridge;
+  }
+  input[type="text"] {
+    width: 99%;
+    height: 26px;
+    border-radius: 5px;
+    border-style: ridge;
+  }
+  #firstNameField {
+    @include inputStyle;
+  }
+
+  .mobileNumber {
+    margin: 0px 0px;
+  }
+  #mobileField {
+    @include inputStyle;
+    outline: none;
+  }
+  #selectState {
+    width: 100%;
+    height: 32px;
+    border-radius: 5px;
+    background-color: white;
+    border-style: ridge;
+  }
+  .error {
+    @include error;
+  }
+}

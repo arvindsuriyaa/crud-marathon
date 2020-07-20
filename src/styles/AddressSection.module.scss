@@ -1,0 +1,27 @@
+@import './variables';
+
+#addressSection {
+  padding: 0px 35px;
+  height: 165px;
+}
+#address {
+  display: flex;
+  flex-direction: row;
+}
+.addressOfStay,
+.presentAddress {
+  margin: 0 15px;
+  width: 50%;
+}
+.error{
+  @include error
+}
+textarea {
+  height: 100px;
+  width: 99%;
+  resize: none;
+}
+.checkBox {
+  margin: 0px 10px;
+  display: flex;
+}

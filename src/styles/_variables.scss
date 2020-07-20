@@ -1,0 +1,15 @@
+@mixin error {
+  color: red;
+  height: 20px;
+}
+
+@mixin formStyle {
+  width: 33.33%;
+  padding: 0 50px;
+}
+@mixin inputStyle {
+  width: 99%;
+  height: 26px;
+  border-radius: 5px;
+  border-style: ridge;
+}

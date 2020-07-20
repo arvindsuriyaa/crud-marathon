@@ -1,0 +1,24 @@
+@import './variables';
+
+.formSection3{
+  @include formStyle;
+}
+#lastNameField, #emailIdField,#cityInput{
+  @include inputStyle
+}
+.error{
+  @include error
+}
+.lastName {
+  margin: 10px 0px;
+}
+.gender {
+  margin: 10px 0px;
+}
+.emailID {
+  margin: 5px 0px;
+}
+#genderCheck {
+  display: flex;
+  margin: 0px;
+}
