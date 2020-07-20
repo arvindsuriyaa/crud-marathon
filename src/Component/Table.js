@@ -10,7 +10,6 @@ import { createSelector } from "reselect";
 import bindDispatch from "../utils/bindDispatch";
 import _ from "lodash";
 import { Pagination } from "./TableComponent/Pagination";
-import details from "./const.js";
 
 class Table extends Component {
   constructor(props) {
@@ -315,7 +314,7 @@ class Table extends Component {
         <div className={styles.tableTitle}>
           <h1>Employee Details</h1>
         </div>
-        {details.length ? (
+        {userHistory.length ? (
           <div>
             <div className={styles.title}>
               <h2>Employee Details</h2>
