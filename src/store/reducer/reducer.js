@@ -25,13 +25,13 @@ const initialState = {
     emailIdSort: false,
   },
   showColumn:{
-    idShow:false,
-    nameShow:false,
-    genderShow:false,
-    dobShow:false,
-    mobileNumberShow:false,
-    emailIdShow:false,
-    actionsShow:false
+    id:false,
+    name:false,
+    gender:false,
+    dob:false,
+    mobileNumber:false,
+    emailId:false,
+    actions:false
   },
   selectAll: false,
   checkBoxFlag: [],

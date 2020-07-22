@@ -41,14 +41,15 @@ class Table extends Component {
     history.push("/Form");
   };
 
-  deleteRow = (row) => {
+  deleteRow = async (row) => {
     const { actions, reducer } = this.props;
     const { checkBoxFlag } = reducer;
-
     let { userCollection } = this.state;
     let userInfo = _.cloneDeep(userCollection);
     let checkedCopy = [...checkBoxFlag];
     userInfo.splice(row.index, 1);
+    checkedCopy[row.original["id"] - 1] = false;
+    await actions.assignData("checkBoxFlag", checkedCopy);
     checkedCopy.splice(row.original["id"] - 1, 1);
     let idCheck;
     let idDeleted = [];
@@ -80,24 +81,24 @@ class Table extends Component {
     });
     if (isFalseCount === checkedCopy.length) {
       ReactDOM.findDOMNode(this.checkboxRef.current).indeterminate = false;
+      await actions.assignData("selectAll", false);
     }
     this.setState(
       {
         userCollection: userInfo,
         rowIndex: null,
       },
-      this.updateComp
+      await this.updateColumn()
     );
-    actions.assignData("checkBoxFlag", checkedCopy);
-    actions.assignData("userHistory", userInfo);
+    await actions.assignData("checkBoxFlag", checkedCopy);
+    await actions.assignData("userHistory", userInfo);
   };
 
   filteredData = () => {
     let { searchInput } = this.state;
     let { reducer } = this.props;
-    let { checkBoxFlag, userHistory } = reducer;
+    let { userHistory } = reducer;
     let clonedArray = JSON.parse(JSON.stringify(userHistory));
-    // let isIndetermined = 0
     let dataFilter = clonedArray.filter((value) => {
       if (!searchInput) {
         return value;
@@ -159,13 +160,12 @@ class Table extends Component {
   };
 
   handleChange = async () => {
-    const { userCollection } = this.state;
     const { reducer, actions } = this.props;
-    const { selectAll } = reducer;
+    const { selectAll, userHistory } = reducer;
     let selectAllCheckBox = !selectAll;
     await actions.assignData("selectAll", selectAllCheckBox);
     let checkedCopy = [];
-    userCollection.map(() => {
+    userHistory.map(() => {
       return checkedCopy.push(selectAllCheckBox);
     });
     await actions.assignData("checkBoxFlag", checkedCopy);
@@ -174,13 +174,16 @@ class Table extends Component {
 
   handleSingleCheckboxChange = async (row) => {
     const { reducer, actions } = this.props;
-    const { checkBoxFlag } = reducer;
+    const { checkBoxFlag, userHistory } = reducer;
     const { userCollection } = this.state;
     let checkedCopy = [...checkBoxFlag];
     checkedCopy[row.original["id"] - 1] = !checkBoxFlag[row.original["id"] - 1];
     let user = [...userCollection];
-    user[row.original["id"] - 1].isChecked =
-      checkedCopy[row.original["id"] - 1];
+    user.map((item, index) => {
+      if (row.original["id"] - 1 === item.id) {
+        user[index].isChecked = checkedCopy[row.original["id"] - 1];
+      }
+    });
     this.setState({ userCollection: user });
     let checkBoxCount = 0;
     checkedCopy.map((flag) => {
@@ -188,15 +191,15 @@ class Table extends Component {
         checkBoxCount += 1;
       }
     });
-    if (checkedCopy.length !== userCollection.length) {
+    if (checkedCopy.length !== userHistory.length) {
       if (!checkBoxCount) {
         ReactDOM.findDOMNode(this.checkboxRef.current).indeterminate = false;
       } else {
         ReactDOM.findDOMNode(this.checkboxRef.current).indeterminate = true;
       }
     }
-    if (checkedCopy.length === userCollection.length) {
-      if (checkBoxCount === userCollection.length) {
+    if (checkedCopy.length === userHistory.length) {
+      if (checkBoxCount === userHistory.length) {
         ReactDOM.findDOMNode(this.checkboxRef.current).indeterminate = false;
         await actions.assignData("selectAll", true);
       } else {
@@ -212,7 +215,7 @@ class Table extends Component {
       }
     }
     await actions.assignData("checkBoxFlag", checkedCopy);
-    this.updateColumn();
+    await this.updateColumn();
   };
 
   handleSort = async (props) => {
@@ -230,22 +233,28 @@ class Table extends Component {
     this.updateColumn();
   };
 
-  toggleColumns = (event) => {
+  toggleColumns = async (event) => {
+    const { reducer, actions } = this.props;
+    const { showColumn } = reducer;
     let name = event.target.name;
     let column = this.state.column;
+    let displayColumn = _.cloneDeep(showColumn);
     let clonedColumn = _.cloneDeep(column);
     clonedColumn.map((column) => {
       if (column.accessor === name) {
-        column.show = !column.show;
+        let flag = !column.show;
+        column.show = flag;
+        displayColumn[`${name}`] = !column.show;
         return column;
       }
     });
-    this.setState({ column: clonedColumn });
+    actions.assignData("showColumn", displayColumn);
+    this.setState({ column: clonedColumn }, await this.updateColumn());
   };
 
-  updateColumn = () => {
+  updateColumn = async () => {
     const { reducer } = this.props;
-    const { checkBoxFlag, toggleIcon, selectAll, isEdit } = reducer;
+    const { checkBoxFlag, toggleIcon, selectAll, isEdit, showColumn } = reducer;
     const { userCollection, showAction } = this.state;
     const columnDetails = {
       toggleIcon: toggleIcon,
@@ -276,6 +285,7 @@ class Table extends Component {
       },
     };
     this.setState({ column: ColumnData(columnDetails) }, () => {
+      const { column } = this.state;
       let flagCount = 0;
       checkBoxFlag.map((flag) => {
         if (flag) {
@@ -285,18 +295,32 @@ class Table extends Component {
       if (flagCount < userCollection.length && flagCount > 0) {
         ReactDOM.findDOMNode(this.checkboxRef.current).indeterminate = true;
       }
+      let findColumn = Object.entries(showColumn);
+      findColumn.map((flag) => {
+        if (flag[1]) {
+          column.map((header) => {
+            if (header.accessor === flag[0]) {
+              header.show = !flag[1];
+            }
+          });
+          this.setState({ column: [...column] });
+        }
+      });
     });
   };
 
   componentDidMount() {
     const { reducer, actions } = this.props;
     const { checkBoxFlag, selectAll, userHistory } = reducer;
-    if (checkBoxFlag.length !== userHistory.length) {
+    if (!checkBoxFlag.length) {
       userHistory.map(() => {
         return checkBoxFlag.push(selectAll);
       });
-      actions.assignData("checkBoxFlag", checkBoxFlag);
+    } else if (checkBoxFlag.length < userHistory.length) {
+      checkBoxFlag.push(false);
+      this.setState({ selectAll: false });
     }
+    actions.assignData("checkBoxFlag", checkBoxFlag);
     this.setState(
       {
         userCollection: userHistory,
@@ -308,7 +332,7 @@ class Table extends Component {
   render() {
     const { userCollection, column } = this.state;
     const { reducer, history } = this.props;
-    const { userHistory } = reducer;
+    const { userHistory, showColumn } = reducer;
     return (
       <Fragment>
         <div className={styles.tableTitle}>
@@ -360,6 +384,7 @@ class Table extends Component {
                             <input
                               type="checkbox"
                               name={column.accessor}
+                              checked={showColumn[`${column.accessor}`]}
                               onChange={this.toggleColumns}
                             />
                             {column.accessor}

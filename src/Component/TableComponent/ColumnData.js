@@ -45,7 +45,7 @@ function ColumnData(props) {
           <div className={styles.checkBoxStyling}>
             <input
               type="checkbox"
-              checked={checkBoxFlag[row.original["id"] - 1]}
+              checked={checkBoxFlag[row.original["id"] - 1]||false}
               onChange={() => {
                 handleSingleCheckboxChange(row);
               }}
@@ -56,6 +56,7 @@ function ColumnData(props) {
       width: 90,
       sortable: false,
       resizable: false,
+      show:true
     },
     {
       Header: () => {
